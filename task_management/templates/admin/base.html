@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Task Management Admin{% endblock %}</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .sidebar {
+            min-height: 100vh;
+            background: #343a40;
+        }
+        .sidebar .nav-link {
+            color: #fff;
+            border-radius: 5px;
+            margin: 2px 0;
+        }
+        .sidebar .nav-link:hover,
+        .sidebar .nav-link.active {
+            background: #495057;
+            color: #fff;
+        }
+        .main-content {
+            padding: 20px;
+        }
+        .stats-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+        }
+        .task-card {
+            border-left: 4px solid;
+            transition: transform 0.2s;
+        }
+        .task-card:hover {
+            transform: translateY(-2px);
+        }
+        .task-pending { border-left-color: #ffc107; }
+        .task-progress { border-left-color: #17a2b8; }
+        .task-completed { border-left-color: #28a745; }
+        .modal-header {
+            background: #f8f9fa;
+        }
+        .btn-primary {
+            background: #667eea;
+            border-color: #667eea;
+        }
+        .btn-primary:hover {
+            background: #5a6fd8;
+            border-color: #5a6fd8;
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            {% if user.is_authenticated %}
+            <!-- Sidebar -->
+            <div class="col-md-2 sidebar p-3">
+                <div class="text-center mb-4">
+                    <h4 class="text-white">
+                        <i class="fas fa-tasks me-2"></i>
+                        Task Admin
+                    </h4>
+                    <small class="text-muted">{{ user.get_role_display }}</small>
+                </div>
+                
+                <nav class="nav flex-column">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'admin_dashboard' %}active{% endif %}" 
+                       href="{% url 'admin_dashboard' %}">
+                        <i class="fas fa-tachometer-alt me-2"></i>
+                        Dashboard
+                    </a>
+                    
+                    {% if user.role == 'superadmin' %}
+                    <a class="nav-link {% if request.resolver_match.url_name == 'manage_users' %}active{% endif %}" 
+                       href="{% url 'manage_users' %}">
+                        <i class="fas fa-users me-2"></i>
+                        Manage Users
+                    </a>
+                    {% endif %}
+                    
+                    <a class="nav-link {% if request.resolver_match.url_name == 'manage_tasks' %}active{% endif %}" 
+                       href="{% url 'manage_tasks' %}">
+                        <i class="fas fa-tasks me-2"></i>
+                        Manage Tasks
+                    </a>
+                    
+                    <a class="nav-link {% if request.resolver_match.url_name == 'task_reports' %}active{% endif %}" 
+                       href="{% url 'task_reports' %}">
+                        <i class="fas fa-chart-line me-2"></i>
+                        Task Reports
+                    </a>
+                    
+                    <hr class="text-white">
+                    
+                    <a class="nav-link text-danger" href="{% url 'admin_logout' %}">
+                        <i class="fas fa-sign-out-alt me-2"></i>
+                        Logout
+                    </a>
+                </nav>
+            </div>
+            
+            <!-- Main Content -->
+            <div class="col-md-10 main-content">
+                {% if messages %}
+                    {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                    {% endfor %}
+                {% endif %}
+
+                {% block content %}{% endblock %}
+            </div>
+            {% else %}
+            <div class="col-12">
+                {% block content %}{% endblock %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.24.0/axios.min.js"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
